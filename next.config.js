@@ -35,7 +35,7 @@ const nextConfig = {
   // Experimental features
   experimental: {
     // Enable if needed for better performance
-    serverComponentsExternalPackages: ['puppeteer'],
+    serverComponentsExternalPackages: ['pdfkit'],
   },
 };
 
