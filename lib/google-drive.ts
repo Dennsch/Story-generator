@@ -28,15 +28,20 @@ export class GoogleDriveService {
     description?: string
   ): Promise<{ fileId: string; webViewLink: string }> {
     try {
+      const { Readable } = require('stream');
+      
       const fileMetadata = {
         name: fileName,
         parents: [this.folderId],
         description: description || 'Generated storybook PDF'
       };
 
+      // Convert Buffer to Stream
+      const stream = Readable.from(pdfBuffer);
+
       const media = {
         mimeType: 'application/pdf',
-        body: Buffer.from(pdfBuffer)
+        body: stream
       };
 
       const response = await this.drive.files.create({

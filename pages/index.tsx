@@ -5,7 +5,6 @@ export default function Home() {
   const [description, setDescription] = useState('');
   const [title, setTitle] = useState('');
   const [targetAudience, setTargetAudience] = useState<'children' | 'young-adult' | 'adult'>('children');
-  const [length, setLength] = useState<'short' | 'medium' | 'long'>('medium');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
@@ -26,7 +25,6 @@ export default function Home() {
           description,
           title: title || undefined,
           targetAudience,
-          length,
         }),
       });
 
@@ -66,7 +64,7 @@ export default function Home() {
         </h1>
         
         <p style={{ fontSize: '1.2em', textAlign: 'center', color: '#7f8c8d', marginBottom: '2rem' }}>
-          Generate beautiful storybooks using AI and automatically save them to Google Drive
+          Generate beautiful 25-page storybooks using AI and automatically save them to Google Drive
         </p>
 
         <div style={{ 
@@ -121,52 +119,39 @@ export default function Home() {
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#2c3e50' }}>
-                  Target Audience
-                </label>
-                <select
-                  value={targetAudience}
-                  onChange={(e) => setTargetAudience(e.target.value as any)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    fontSize: '1rem',
-                    border: '2px solid #e0e0e0',
-                    borderRadius: '8px',
-                    fontFamily: 'inherit',
-                    background: 'white'
-                  }}
-                >
-                  <option value="children">Children (5-10)</option>
-                  <option value="young-adult">Young Adult (11-17)</option>
-                  <option value="adult">Adult</option>
-                </select>
-              </div>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#2c3e50' }}>
+                Target Audience
+              </label>
+              <select
+                value={targetAudience}
+                onChange={(e) => setTargetAudience(e.target.value as any)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  fontSize: '1rem',
+                  border: '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  fontFamily: 'inherit',
+                  background: 'white'
+                }}
+              >
+                <option value="children">Children (5-10)</option>
+                <option value="young-adult">Young Adult (11-17)</option>
+                <option value="adult">Adult</option>
+              </select>
+            </div>
 
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#2c3e50' }}>
-                  Story Length
-                </label>
-                <select
-                  value={length}
-                  onChange={(e) => setLength(e.target.value as any)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    fontSize: '1rem',
-                    border: '2px solid #e0e0e0',
-                    borderRadius: '8px',
-                    fontFamily: 'inherit',
-                    background: 'white'
-                  }}
-                >
-                  <option value="short">Short (3-5 pages)</option>
-                  <option value="medium">Medium (6-10 pages)</option>
-                  <option value="long">Long (11-15 pages)</option>
-                </select>
-              </div>
+            <div style={{ 
+              background: '#e3f2fd', 
+              padding: '1rem', 
+              borderRadius: '8px', 
+              marginBottom: '1.5rem',
+              border: '1px solid #90caf9'
+            }}>
+              <p style={{ margin: 0, color: '#1565c0', fontSize: '0.95rem' }}>
+                📖 All stories are generated with exactly <strong>25 pages</strong>
+              </p>
             </div>
 
             <button
@@ -283,9 +268,10 @@ export default function Home() {
 {`{
   "description": "A story about a brave little mouse",
   "title": "The Adventures of Squeaky", // optional
-  "targetAudience": "children", // optional
-  "length": "medium" // optional
-}`}
+  "targetAudience": "children" // optional: children, young-adult, adult
+}
+
+Note: All stories are generated with exactly 25 pages.`}
             </pre>
 
             <h3>Example cURL:</h3>
@@ -300,8 +286,7 @@ export default function Home() {
   -H "Content-Type: application/json" \\
   -d '{
     "description": "A magical adventure",
-    "targetAudience": "children",
-    "length": "medium"
+    "targetAudience": "children"
   }'`}
             </pre>
           </div>

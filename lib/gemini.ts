@@ -7,7 +7,7 @@ export class GeminiService {
 
   constructor(config: GeminiConfig) {
     this.genAI = new GoogleGenerativeAI(config.apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-pro' });
+    this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
   }
 
   async generateStorybook(request: StoryRequest): Promise<GeneratedStory> {
@@ -25,13 +25,7 @@ export class GeminiService {
   }
 
   private buildPrompt(request: StoryRequest): string {
-    const { description, targetAudience = 'children', length = 'medium' } = request;
-    
-    const lengthGuide = {
-      short: '3-5 pages',
-      medium: '6-10 pages',
-      long: '11-15 pages'
-    };
+    const { description, targetAudience = 'children' } = request;
 
     const audienceGuide = {
       children: 'simple language suitable for ages 5-10, with moral lessons',
@@ -39,7 +33,7 @@ export class GeminiService {
       adult: 'sophisticated language and complex themes for mature readers'
     };
 
-    return `Create a ${lengthGuide[length]} storybook based on this description: "${description}"
+    return `Create a 25-page storybook based on this description: "${description}"
 
 Target audience: ${targetAudience} (${audienceGuide[targetAudience]})
 
@@ -55,12 +49,16 @@ Please format your response as a JSON object with the following structure:
   ]
 }
 
+IMPORTANT: You MUST create exactly 25 pages. The story should be complete and well-paced across all 25 pages.
+
 Guidelines:
+- Create EXACTLY 25 pages
 - Each page should have 1-3 sentences for children, 2-4 for young adults, 3-5 for adults
 - Include vivid descriptions that would work well for illustrations
 - Create engaging, age-appropriate content
-- Ensure the story has a clear beginning, middle, and end
+- Ensure the story has a clear beginning, middle, and end distributed across all 25 pages
 - Include an imagePrompt for each page that describes what should be illustrated
+- Pace the story appropriately: introduction (pages 1-5), rising action (pages 6-12), climax (pages 13-17), falling action (pages 18-22), resolution (pages 23-25)
 
 Make sure to return valid JSON only, no additional text.`;
   }
