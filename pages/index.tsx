@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 
 export default function Home() {
@@ -8,6 +8,11 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState('');
+  const [apiUrl, setApiUrl] = useState('https://your-app.vercel.app');
+
+  useEffect(() => {
+    setApiUrl(window.location.origin);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -282,7 +287,7 @@ Note: All stories are generated with exactly 25 pages.`}
               borderRadius: '4px',
               overflow: 'auto'
             }}>
-{`curl -X POST ${typeof window !== 'undefined' ? window.location.origin : 'https://your-app.vercel.app'}/api/generate-storybook \\
+{`curl -X POST ${apiUrl}/api/generate-storybook \\
   -H "Content-Type: application/json" \\
   -d '{
     "description": "A magical adventure",
