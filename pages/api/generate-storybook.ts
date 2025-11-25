@@ -62,7 +62,8 @@ export default async function handler(
     const pdfGenerator = new PDFGenerator();
     const googleDriveService = new GoogleDriveService({
       folderId: googleDriveFolderId,
-      serviceAccountKey: googleServiceAccountKey
+      serviceAccountKey: googleServiceAccountKey,
+      impersonateUser: process.env.GOOGLE_DRIVE_IMPERSONATE_USER
     });
 
     // Step 1: Generate story content using Gemini

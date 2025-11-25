@@ -29,6 +29,7 @@ export interface StoryPage {
 export interface GoogleDriveConfig {
   folderId: string;
   serviceAccountKey: string;
+  impersonateUser?: string;
 }
 
 export interface GeminiConfig {

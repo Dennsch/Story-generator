@@ -11,12 +11,13 @@ export class GoogleDriveService {
     // Parse the service account key
     const serviceAccountKey = JSON.parse(config.serviceAccountKey);
     
-    // Create JWT auth client
+    // Create JWT auth client with domain-wide delegation (impersonation)
     const auth = new google.auth.JWT(
       serviceAccountKey.client_email,
       undefined,
       serviceAccountKey.private_key,
-      ['https://www.googleapis.com/auth/drive.file']
+      ['https://www.googleapis.com/auth/drive'],
+      config.impersonateUser // User email to impersonate
     );
 
     this.drive = google.drive({ version: 'v3', auth });
@@ -47,7 +48,8 @@ export class GoogleDriveService {
       const response = await this.drive.files.create({
         resource: fileMetadata,
         media: media,
-        fields: 'id,webViewLink'
+        fields: 'id,webViewLink',
+        supportsAllDrives: true
       });
 
       // Make the file publicly viewable (optional)
@@ -56,7 +58,8 @@ export class GoogleDriveService {
         resource: {
           role: 'reader',
           type: 'anyone'
-        }
+        },
+        supportsAllDrives: true
       });
 
       return {
