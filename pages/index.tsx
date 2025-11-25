@@ -1,7 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
 
 export default function Home() {
+  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState('');
+  const [targetAudience, setTargetAudience] = useState<'children' | 'young-adult' | 'adult'>('children');
+  const [length, setLength] = useState<'short' | 'medium' | 'long'>('medium');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setResult(null);
+
+    try {
+      const response = await fetch('/api/generate-storybook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          description,
+          title: title || undefined,
+          targetAudience,
+          length,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setResult(data);
+        setDescription('');
+        setTitle('');
+      } else {
+        setError(data.message || 'Failed to generate storybook');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={{ 
       fontFamily: 'Arial, sans-serif', 
@@ -11,121 +55,257 @@ export default function Home() {
       lineHeight: '1.6'
     }}>
       <Head>
-        <title>Story Generator API</title>
+        <title>Story Generator</title>
         <meta name="description" content="Generate storybooks with AI and save to Google Drive" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main>
         <h1 style={{ color: '#2c3e50', textAlign: 'center' }}>
-          📚 Story Generator API
+          📚 Story Generator
         </h1>
         
-        <p style={{ fontSize: '1.2em', textAlign: 'center', color: '#7f8c8d' }}>
+        <p style={{ fontSize: '1.2em', textAlign: 'center', color: '#7f8c8d', marginBottom: '2rem' }}>
           Generate beautiful storybooks using AI and automatically save them to Google Drive
         </p>
 
         <div style={{ 
-          background: '#f8f9fa', 
+          background: '#ffffff', 
           padding: '2rem', 
-          borderRadius: '8px', 
-          margin: '2rem 0',
-          border: '1px solid #e9ecef'
+          borderRadius: '12px', 
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          marginBottom: '2rem'
         }}>
-          <h2 style={{ color: '#2c3e50' }}>🚀 API Endpoint</h2>
-          <p><strong>POST</strong> <code>/api/generate-storybook</code></p>
-          
-          <h3>Request Body:</h3>
-          <pre style={{ 
-            background: '#2c3e50', 
-            color: 'white', 
-            padding: '1rem', 
-            borderRadius: '4px',
-            overflow: 'auto'
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#2c3e50' }}>
+                Story Description *
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Describe the story you want to create... (e.g., A brave little mouse goes on an adventure)"
+                required
+                maxLength={1000}
+                style={{
+                  width: '100%',
+                  minHeight: '120px',
+                  padding: '0.75rem',
+                  fontSize: '1rem',
+                  border: '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  fontFamily: 'inherit',
+                  resize: 'vertical'
+                }}
+              />
+              <small style={{ color: '#7f8c8d' }}>{description.length}/1000 characters</small>
+            </div>
+
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#2c3e50' }}>
+                Story Title (optional)
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Leave blank to auto-generate"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  fontSize: '1rem',
+                  border: '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  fontFamily: 'inherit'
+                }}
+              />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#2c3e50' }}>
+                  Target Audience
+                </label>
+                <select
+                  value={targetAudience}
+                  onChange={(e) => setTargetAudience(e.target.value as any)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    fontSize: '1rem',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontFamily: 'inherit',
+                    background: 'white'
+                  }}
+                >
+                  <option value="children">Children (5-10)</option>
+                  <option value="young-adult">Young Adult (11-17)</option>
+                  <option value="adult">Adult</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#2c3e50' }}>
+                  Story Length
+                </label>
+                <select
+                  value={length}
+                  onChange={(e) => setLength(e.target.value as any)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    fontSize: '1rem',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontFamily: 'inherit',
+                    background: 'white'
+                  }}
+                >
+                  <option value="short">Short (3-5 pages)</option>
+                  <option value="medium">Medium (6-10 pages)</option>
+                  <option value="long">Long (11-15 pages)</option>
+                </select>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading || !description.trim()}
+              style={{
+                width: '100%',
+                padding: '1rem',
+                fontSize: '1.1rem',
+                fontWeight: 'bold',
+                color: 'white',
+                background: loading || !description.trim() ? '#95a5a6' : '#3498db',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: loading || !description.trim() ? 'not-allowed' : 'pointer',
+                transition: 'background 0.3s'
+              }}
+              onMouseOver={(e) => {
+                if (!loading && description.trim()) {
+                  e.currentTarget.style.background = '#2980b9';
+                }
+              }}
+              onMouseOut={(e) => {
+                if (!loading && description.trim()) {
+                  e.currentTarget.style.background = '#3498db';
+                }
+              }}
+            >
+              {loading ? '🎨 Generating Story...' : '✨ Generate Storybook'}
+            </button>
+          </form>
+        </div>
+
+        {error && (
+          <div style={{
+            background: '#fee',
+            border: '2px solid #fcc',
+            borderRadius: '8px',
+            padding: '1rem',
+            marginBottom: '2rem',
+            color: '#c33'
           }}>
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+
+        {result && (
+          <div style={{
+            background: '#e8f5e9',
+            border: '2px solid #4caf50',
+            borderRadius: '8px',
+            padding: '1.5rem',
+            marginBottom: '2rem'
+          }}>
+            <h2 style={{ color: '#2e7d32', marginTop: 0 }}>✅ Success!</h2>
+            <p style={{ margin: '0.5rem 0' }}>
+              <strong>File:</strong> {result.fileName}
+            </p>
+            <p style={{ margin: '0.5rem 0' }}>
+              <strong>File ID:</strong> {result.fileId}
+            </p>
+            {result.driveUrl && (
+              <a
+                href={result.driveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  marginTop: '1rem',
+                  padding: '0.75rem 1.5rem',
+                  background: '#4caf50',
+                  color: 'white',
+                  textDecoration: 'none',
+                  borderRadius: '8px',
+                  fontWeight: 'bold'
+                }}
+              >
+                📄 View in Google Drive
+              </a>
+            )}
+          </div>
+        )}
+
+        <details style={{ marginTop: '3rem' }}>
+          <summary style={{ 
+            cursor: 'pointer', 
+            padding: '1rem',
+            background: '#f8f9fa',
+            borderRadius: '8px',
+            fontWeight: 'bold',
+            color: '#2c3e50'
+          }}>
+            🚀 API Documentation
+          </summary>
+          
+          <div style={{ 
+            background: '#f8f9fa', 
+            padding: '2rem', 
+            borderRadius: '8px', 
+            marginTop: '1rem',
+            border: '1px solid #e9ecef'
+          }}>
+            <h3 style={{ color: '#2c3e50' }}>Endpoint</h3>
+            <p><strong>POST</strong> <code>/api/generate-storybook</code></p>
+            
+            <h3>Request Body:</h3>
+            <pre style={{ 
+              background: '#2c3e50', 
+              color: 'white', 
+              padding: '1rem', 
+              borderRadius: '4px',
+              overflow: 'auto'
+            }}>
 {`{
   "description": "A story about a brave little mouse",
   "title": "The Adventures of Squeaky", // optional
-  "targetAudience": "children", // optional: children, young-adult, adult
-  "length": "medium" // optional: short, medium, long
+  "targetAudience": "children", // optional
+  "length": "medium" // optional
 }`}
-          </pre>
+            </pre>
 
-          <h3>Response:</h3>
-          <pre style={{ 
-            background: '#27ae60', 
-            color: 'white', 
-            padding: '1rem', 
-            borderRadius: '4px',
-            overflow: 'auto'
-          }}>
-{`{
-  "success": true,
-  "message": "Storybook generated and uploaded successfully",
-  "fileId": "1ABC123...",
-  "fileName": "the-adventures-of-squeaky-2024-01-15.pdf",
-  "driveUrl": "https://drive.google.com/file/d/1ABC123.../view"
-}`}
-          </pre>
-        </div>
-
-        <div style={{ 
-          background: '#fff3cd', 
-          padding: '1.5rem', 
-          borderRadius: '8px', 
-          border: '1px solid #ffeaa7',
-          margin: '2rem 0'
-        }}>
-          <h2 style={{ color: '#856404' }}>⚙️ Configuration Required</h2>
-          <p>Before using this API, make sure to set up the following environment variables:</p>
-          <ul>
-            <li><strong>GEMINI_API_KEY</strong> - Your Google Gemini API key</li>
-            <li><strong>GOOGLE_DRIVE_FOLDER_ID</strong> - Target Google Drive folder ID</li>
-            <li><strong>GOOGLE_SERVICE_ACCOUNT_KEY</strong> - Google service account JSON key</li>
-          </ul>
-          <p>See <code>.env.example</code> for detailed setup instructions.</p>
-        </div>
-
-        <div style={{ 
-          background: '#d1ecf1', 
-          padding: '1.5rem', 
-          borderRadius: '8px', 
-          border: '1px solid #bee5eb',
-          margin: '2rem 0'
-        }}>
-          <h2 style={{ color: '#0c5460' }}>📖 How it works</h2>
-          <ol>
-            <li><strong>Story Generation:</strong> Uses Google Gemini AI to create engaging storybook content</li>
-            <li><strong>PDF Creation:</strong> Converts the story into a beautifully formatted PDF</li>
-            <li><strong>Cloud Storage:</strong> Automatically uploads the PDF to your specified Google Drive folder</li>
-            <li><strong>Instant Access:</strong> Returns a shareable Google Drive link</li>
-          </ol>
-        </div>
-
-        <div style={{ 
-          background: '#f8d7da', 
-          padding: '1.5rem', 
-          borderRadius: '8px', 
-          border: '1px solid #f5c6cb',
-          margin: '2rem 0'
-        }}>
-          <h2 style={{ color: '#721c24' }}>🔧 Example Usage</h2>
-          <pre style={{ 
-            background: '#2c3e50', 
-            color: 'white', 
-            padding: '1rem', 
-            borderRadius: '4px',
-            overflow: 'auto'
-          }}>
+            <h3>Example cURL:</h3>
+            <pre style={{ 
+              background: '#2c3e50', 
+              color: 'white', 
+              padding: '1rem', 
+              borderRadius: '4px',
+              overflow: 'auto'
+            }}>
 {`curl -X POST ${typeof window !== 'undefined' ? window.location.origin : 'https://your-app.vercel.app'}/api/generate-storybook \\
   -H "Content-Type: application/json" \\
   -d '{
-    "description": "A magical adventure about a young wizard learning to fly",
+    "description": "A magical adventure",
     "targetAudience": "children",
     "length": "medium"
   }'`}
-          </pre>
-        </div>
+            </pre>
+          </div>
+        </details>
 
         <footer style={{ 
           textAlign: 'center', 
@@ -134,7 +314,7 @@ export default function Home() {
           borderTop: '1px solid #e9ecef',
           color: '#6c757d'
         }}>
-          <p>Built with ❤️ using TypeScript, Next.js, Google Gemini AI, and Google Drive API</p>
+          <p>Built with TypeScript, Next.js, Google Gemini AI, and Google Drive API</p>
         </footer>
       </main>
     </div>

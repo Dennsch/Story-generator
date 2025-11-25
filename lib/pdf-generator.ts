@@ -25,12 +25,12 @@ export class PDFGenerator {
         doc.on('error', reject);
 
         // Title page
+        doc.moveDown(8);
         doc.fontSize(32)
            .font('Helvetica-Bold')
            .fillColor('#2c3e50')
            .text(story.title, {
-             align: 'center',
-             valign: 'center'
+             align: 'center'
            });
         
         doc.moveDown(2);
