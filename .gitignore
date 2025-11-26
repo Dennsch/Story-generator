@@ -165,6 +165,9 @@ node_modules/
 *service-account*.json
 *credentials*.json
 
+# Generated PDFs
+generated-pdfs/
+
 # IDE files
 .vscode/
 .idea/

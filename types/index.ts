@@ -11,6 +11,7 @@ export interface StoryResponse {
   fileId?: string;
   fileName?: string;
   driveUrl?: string;
+  localPath?: string;
   error?: string;
 }
 
@@ -29,7 +30,6 @@ export interface StoryPage {
 export interface GoogleDriveConfig {
   folderId: string;
   serviceAccountKey: string;
-  impersonateUser?: string;
 }
 
 export interface GeminiConfig {

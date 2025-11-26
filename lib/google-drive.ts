@@ -11,13 +11,12 @@ export class GoogleDriveService {
     // Parse the service account key
     const serviceAccountKey = JSON.parse(config.serviceAccountKey);
     
-    // Create JWT auth client with domain-wide delegation (impersonation)
+    // Create JWT auth client
     const auth = new google.auth.JWT(
       serviceAccountKey.client_email,
       undefined,
       serviceAccountKey.private_key,
-      ['https://www.googleapis.com/auth/drive'],
-      config.impersonateUser // User email to impersonate
+      ['https://www.googleapis.com/auth/drive.file']
     );
 
     this.drive = google.drive({ version: 'v3', auth });

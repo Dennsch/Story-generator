@@ -6,6 +6,7 @@ A TypeScript application that generates beautiful storybooks using Google Gemini
 
 - **AI-Powered Story Generation**: Uses Google Gemini AI to create engaging stories
 - **PDF Generation**: Converts stories into beautifully formatted PDF storybooks
+- **Local Storage**: Saves PDFs locally in the `generated-pdfs/` directory before uploading
 - **Google Drive Integration**: Automatically uploads PDFs to your specified Google Drive folder
 - **Configurable Parameters**: Customize story length, target audience, and more
 - **RESTful API**: Simple POST endpoint for easy integration
@@ -123,9 +124,12 @@ POST /api/generate-storybook
   "message": "Storybook generated and uploaded successfully",
   "fileId": "1ABC123DEF456GHI789JKL",
   "fileName": "the-adventures-of-squeaky-2024-01-15.pdf",
-  "driveUrl": "https://drive.google.com/file/d/1ABC123DEF456GHI789JKL/view"
+  "driveUrl": "https://drive.google.com/file/d/1ABC123DEF456GHI789JKL/view",
+  "localPath": "/path/to/project/generated-pdfs/the-adventures-of-squeaky-2024-01-15.pdf"
 }
 ```
+
+**Note**: PDFs are saved locally in the `generated-pdfs/` directory before being uploaded to Google Drive. This directory is automatically created if it doesn't exist and is excluded from version control.
 
 ### Example Usage
 

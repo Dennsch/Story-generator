@@ -3,6 +3,8 @@ import { StoryRequest, StoryResponse } from '@/types';
 import { GeminiService } from '@/lib/gemini';
 import { PDFGenerator } from '@/lib/pdf-generator';
 import { GoogleDriveService } from '@/lib/google-drive';
+import fs from 'fs';
+import path from 'path';
 
 export default async function handler(
   req: NextApiRequest,
@@ -62,8 +64,7 @@ export default async function handler(
     const pdfGenerator = new PDFGenerator();
     const googleDriveService = new GoogleDriveService({
       folderId: googleDriveFolderId,
-      serviceAccountKey: googleServiceAccountKey,
-      impersonateUser: process.env.GOOGLE_DRIVE_IMPERSONATE_USER
+      serviceAccountKey: googleServiceAccountKey
     });
 
     // Step 1: Generate story content using Gemini
@@ -75,7 +76,20 @@ export default async function handler(
     const pdfBuffer = await pdfGenerator.generatePDF(generatedStory);
     const fileName = pdfGenerator.generateFileName(generatedStory);
 
-    // Step 3: Upload PDF to Google Drive
+    // Step 3: Save PDF locally
+    console.log('Saving PDF locally...');
+    const localStorageDir = path.join(process.cwd(), 'generated-pdfs');
+    
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(localStorageDir)) {
+      fs.mkdirSync(localStorageDir, { recursive: true });
+    }
+    
+    const localFilePath = path.join(localStorageDir, fileName);
+    fs.writeFileSync(localFilePath, pdfBuffer);
+    console.log(`PDF saved locally at: ${localFilePath}`);
+
+    // Step 4: Upload PDF to Google Drive
     console.log('Uploading to Google Drive...');
     const uploadResult = await googleDriveService.uploadPDF(
       pdfBuffer,
@@ -89,7 +103,8 @@ export default async function handler(
       message: 'Storybook generated and uploaded successfully',
       fileId: uploadResult.fileId,
       fileName: fileName,
-      driveUrl: uploadResult.webViewLink
+      driveUrl: uploadResult.webViewLink,
+      localPath: localFilePath
     });
 
   } catch (error) {
